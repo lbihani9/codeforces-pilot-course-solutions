@@ -1,0 +1,124 @@
+#include <bits/stdc++.h>
+using namespace std;
+using namespace chrono;
+#define int long long
+#define ll long long 
+#define ld long double
+#define all(x) (x).begin(), (x).end()
+#define rall(x) (x).rbegin(), (x).rend()
+#define Dgoogle(t, ans) cout << "Case #" << (t) << ": " << fixed << (ans) << "\n";
+#define google(t, ans) cout << "Case #" << (t) << ": " << (ans) << "\n";
+const ll MOD = 1000000007;
+const ll inf = (long long)1e18;
+const int INF = (int)1e9 + 5;
+
+void init_code() {
+    ios_base::sync_with_stdio(false); cin.tie(NULL);
+    #ifndef ONLINE_JUDGE
+        freopen("input.txt", "r", stdin); freopen("output.txt", "w", stdout); freopen("error.txt", "w", stderr);
+    #endif
+}
+/*-------------------------------------------------------------------------------------------------------*/
+/*
+Idea: we cannot efficienty remove edges in disjoint sets but, key points to note here are:
+
+1. After end of all the queries graph will only contain isolated vertices. i.e, it will contain no edge.
+2. cut operation is similar to union operation if we process queries in reverse order.
+
+*/
+struct DSU {
+    vector<int> parent;
+    vector<int> sz;
+    DSU(int n) {
+        parent = vector<int>(n+1, 0LL);
+        sz = vector<int>(n+1, 1LL);
+        for (int i=1LL; i<=n; ++i) { 
+            parent[i] = i;
+        }
+    }
+    int find(int node) {
+        if (node == parent[node]) 
+            return node;
+
+        // no path compression
+        return find(parent[node]);
+    }
+    void merge(int node1, int node2) {
+        int p1 = find(node1);
+        int p2 = find(node2);
+        if (p1 == p2) { 
+            return; 
+        }
+    
+        if (sz[p1] >= sz[p2]) {
+            parent[p2] = p1; 
+            sz[p1] += sz[p2];
+        }
+        else {
+            parent[p1] = p2; 
+            sz[p2] += sz[p1];
+        }
+        return;
+    }
+};
+void solve() {
+    int n, m, k; cin >> n >> m >> k;
+    map<int, set<int>> graph;
+    DSU dsu(n);
+
+    for (int i=0; i<m; ++i) {
+        int u, v; cin >> u >> v;
+        graph[u].insert(v);
+        graph[v].insert(u);
+    }
+
+    // ask ==> 1, cut ==> 0
+    vector<array<int, 3>> queries;
+    for (int i=0; i<k; ++i) {
+        string str; cin >> str;
+        int u, v; cin >> u >> v;
+        queries.push_back({(str == "ask"), u, v});
+    }
+
+    reverse(all(queries));
+    vector<int> res;
+
+    for (int i=0; i<k; ++i) {
+        int q = queries[i][0];
+        int u = queries[i][1], v = queries[i][2];
+        if (q == 1) {
+            if (dsu.find(u) == dsu.find(v)) {
+                res.push_back(1);
+            }
+            else {
+                res.push_back(0);
+            }
+        }
+        else {
+            if (graph[u].count(v) && graph[v].count(u)) {
+                dsu.merge(u, v);
+                graph[u].erase(v);
+                graph[v].erase(u);
+            }
+        }
+    }
+
+    while (!res.empty()) {
+        cout << ((res.back() == 1) ? "YES\n" : "NO\n");
+        res.pop_back();
+    }
+
+    return;
+}
+
+signed main() {
+    init_code();
+    auto start1 = high_resolution_clock::now();
+    solve();
+    auto stop1 = high_resolution_clock::now();
+    auto duration = duration_cast<microseconds>(stop1 - start1);
+    #ifndef ONLINE_JUDGE
+        cerr << "Time: " << duration.count() / 1000 << endl;
+    #endif
+    return 0;
+}
