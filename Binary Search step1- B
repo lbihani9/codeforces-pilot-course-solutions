@@ -1,0 +1,60 @@
+#include <bits/stdc++.h>
+using namespace std;
+using namespace chrono;
+#define int long long
+#define ll long long 
+#define ld long double
+#define all(x) (x).begin(), (x).end()
+#define rall(x) (x).rbegin(), (x).rend()
+#define Dgoogle(t, ans) cout << "Case #" << (t) << ": " << fixed << (ans) << "\n";
+#define google(t, ans) cout << "Case #" << (t) << ": " << (ans) << "\n";
+const ll MOD = 1000000007;
+const ll inf = (long long)1e18;
+const int INF = (int)1e9 + 5;
+
+void init_code() {
+    ios_base::sync_with_stdio(false); cin.tie(NULL);
+    #ifndef ONLINE_JUDGE
+        freopen("input.txt", "r", stdin); freopen("output.txt", "w", stdout); freopen("error.txt", "w", stderr);
+    #endif
+}
+/*-------------------------------------------------------------------------------------------------------*/
+void solve() {
+    int n, k; cin >> n >> k;
+    vector<int> arr(n);
+    for (int i=0; i<n; ++i) {
+        cin >> arr[i];
+    }
+
+    for (int i=0; i<k; ++i) {
+        int val; cin >> val;
+        int l = -1, r = n;
+        while (l + 1 < r) {
+            int m = l + (r - l)/2;
+            if (arr[m] <= val) {
+                l = m;
+            }
+            else {
+                r = m;
+            }
+        }
+        if (l < 0) {
+            l += 1;
+        }
+
+        cout << ((arr[l] <= val) ? l+1 : 0) << "\n";
+    }
+    return;
+}
+
+signed main() {
+    init_code();
+    auto start1 = high_resolution_clock::now();
+    solve();
+    auto stop1 = high_resolution_clock::now();
+    auto duration = duration_cast<microseconds>(stop1 - start1);
+    #ifndef ONLINE_JUDGE
+        cerr << "Time: " << duration.count() / 1000 << endl;
+    #endif
+    return 0;
+}
